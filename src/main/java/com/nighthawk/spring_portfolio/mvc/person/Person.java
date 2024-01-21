@@ -24,6 +24,7 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
@@ -46,7 +47,6 @@ The last annotation connect to database
 @Entity
 @Convert(attributeName ="person", converter = JsonType.class)
 public class Person {
-
     // automatic unique identifier for Person record
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -70,7 +70,7 @@ public class Person {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dob;
 
-    // To be implemented
+    // FULLY IMPLEMENTED!
     @ManyToMany(fetch = EAGER)
     private Collection<PersonRole> roles = new ArrayList<>();
 
@@ -105,7 +105,6 @@ public class Person {
 
     // Initialize static test data 
     public static Person[] init() {
-
         // basics of class construction
         Person p1 = new Person();
         p1.setName("Thomas Edison");
