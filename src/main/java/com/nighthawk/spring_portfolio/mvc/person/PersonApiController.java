@@ -143,11 +143,12 @@ public class PersonApiController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Object> putPerson(@RequestParam("email") String email, @RequestParam("password") String password) 
+    public ResponseEntity<Object> putPerson(@RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("name") String name ) 
     {
         Person person = repository.findByEmail(email);
         person.setPassword(password);
-        
+        person.setName(name);
+        repository.save(person);
         return new ResponseEntity<>(email +" is updated successfully", HttpStatus.OK);
     }
 
