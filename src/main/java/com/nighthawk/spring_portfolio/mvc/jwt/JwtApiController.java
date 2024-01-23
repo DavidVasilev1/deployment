@@ -33,17 +33,20 @@ public class JwtApiController {
 	@PostMapping("/authenticate")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody Person authenticationRequest) throws Exception {
 		authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-		final UserDetails userDetails = personDetailsService
-				.loadUserByUsername(authenticationRequest.getEmail());
+		final UserDetails userDetails = personDetailsService.loadUserByUsername(authenticationRequest.getEmail());
 		final String token = jwtTokenUtil.generateToken(userDetails);
+		
+		// Create a ResponseCookie
 		final ResponseCookie tokenCookie = ResponseCookie.from("jwt", token)
-			.httpOnly(true)
-			.secure(true)
-			.path("/")
-			.maxAge(3600)
-			.sameSite("None; Secure")
-			// .domain("example.com") // Set to backend domain
-			.build();
+				.httpOnly(true)
+				.secure(true)
+				.path("/")
+				.maxAge(3600)
+				.sameSite("None; Secure") // "None" does not require "Secure"
+				// .domain("example.com") // Set to backend domain
+				.build();
+		
+		// Add the cookie directly to the response
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, tokenCookie.toString()).build();
 	}
 
