@@ -1,5 +1,7 @@
 package com.nighthawk.spring_portfolio.mvc.person;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/api/person")
@@ -84,10 +87,11 @@ public class PersonApiController {
                                              @RequestParam("name") String name,
                                              @RequestParam("dob") String dobString) {
         Date dob;
+        System.out.println("\t\t\t\t\t"+email+"\t\t\t\t\t");
         try {
             dob = new SimpleDateFormat("MM-dd-yyyy").parse(dobString);
         } catch (Exception e) {
-            return new ResponseEntity<>(dobString +" error; try MM-dd-yyyy", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(dobString +" error;" + e + "try MM-dd-yyyy", HttpStatus.BAD_REQUEST);
         }
         // A person object WITHOUT ID will create a new record with default roles as student
         Person person = new Person(email, password, name, dob);
