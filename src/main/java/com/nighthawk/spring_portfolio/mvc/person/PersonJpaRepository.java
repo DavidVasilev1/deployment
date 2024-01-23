@@ -13,6 +13,7 @@ Extends the JpaRepository interface from Spring Data JPA.
  */
 public interface PersonJpaRepository extends JpaRepository<Person, Long> {
     Person findByEmail(String email);
+    List<Person> findByUserEmail(String email);
 
     List<Person> findAllByOrderByNameAsc();
 
@@ -33,4 +34,6 @@ public interface PersonJpaRepository extends JpaRepository<Person, Long> {
     /*
       https://www.baeldung.com/spring-data-jpa-query
     */
+
+    void deleteByEmail(String email);
 }

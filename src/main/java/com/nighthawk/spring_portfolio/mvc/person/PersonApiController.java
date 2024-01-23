@@ -66,16 +66,16 @@ public class PersonApiController {
     /*
     DELETE individual Person using ID
      */
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Person> deletePerson(@PathVariable long id) {
-        Optional<Person> optional = repository.findById(id);
-        if (optional.isPresent()) {  // Good ID
-            Person person = optional.get();  // value from findByID
-            repository.deleteById(id);  // value from findByID
-            return new ResponseEntity<>(person, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+    @DeleteMapping("/delete/{email}")
+    public ResponseEntity<Person> deletePerson(@PathVariable String email) {
+        List<Person> persons = repository.findByUserEmail(email);
+        if (!persons.isEmpty()) {  // Check if the list is not empty
+            Person person = persons.get(0);  // Get the first person from the list
+            repository.deleteByEmail(email);
+            return new ResponseEntity<>(person, HttpStatus.OK);
         }
-        // Bad ID
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+        // Bad email
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     /*
