@@ -10,8 +10,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nighthawk.spring_portfolio.mvc.person.Person;
@@ -47,7 +47,7 @@ public class JwtApiController {
 				.build();
 		
 		// Add the cookie directly to the response
-		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, tokenCookie.toString()).build();
+		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, tokenCookie.toString()).body(new TokenResponse(token));
 	}
 
 	private void authenticate(String username, String password) throws Exception {
@@ -59,6 +59,18 @@ public class JwtApiController {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		} catch (Exception e) {
 			throw new Exception(e);
+		}
+	}
+
+	public class TokenResponse {
+		private final String token;
+	
+		public TokenResponse(String token) {
+			this.token = token;
+		}
+	
+		public String getToken() {
+			return token;
 		}
 	}
 }

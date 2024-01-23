@@ -1,7 +1,5 @@
 package com.nighthawk.spring_portfolio.mvc.person;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+
 
 
 @RestController
@@ -66,16 +66,31 @@ public class PersonApiController {
     /*
     DELETE individual Person using ID
      */
+    // OLD CODE - DAVID
+    // @DeleteMapping("/delete/{email}")
+    // public ResponseEntity<Person> deletePerson(@PathVariable String email) {
+    //     List<Person> persons = repository.findAllByOrderByEmailAsc(email);
+    //     if (!persons.isEmpty()) {  // Check if the list is not empty
+    //         Person person = persons.get(0);  // Get the first person from the list
+    //         repository.deleteByEmail(email);
+    //         return new ResponseEntity<>(person, HttpStatus.OK);
+    //     }
+    //     // Bad email
+    //     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    // }
+    
+    // NEW CODE - ADI
+    @Transactional
     @DeleteMapping("/delete/{email}")
     public ResponseEntity<Person> deletePerson(@PathVariable String email) {
-        List<Person> persons = repository.findByUserEmail(email);
-        if (!persons.isEmpty()) {  // Check if the list is not empty
-            Person person = persons.get(0);  // Get the first person from the list
+        Person person = repository.findByEmail(email);
+        
+        if (person != null) {  // Check if the person is found
             repository.deleteByEmail(email);
             return new ResponseEntity<>(person, HttpStatus.OK);
         }
-        // Bad email
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        // Person with the given email not found
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /*
