@@ -65,8 +65,7 @@ public class ModelInit {
                     personService.addRoleToPerson(person.getEmail(), "ROLE_STUDENT");
                 }
             }
-            // for lesson demonstration: giving admin role to Mortensen
-            personService.addRoleToPerson(personArray[4].getEmail(), "ROLE_ADMIN");
+            personService.addRoleToPerson(personArray[1].getEmail(), "ROLE_ADMIN");
         };
     }
 }

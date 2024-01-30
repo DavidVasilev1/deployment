@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.text.ParseException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -63,23 +64,6 @@ public class PersonApiController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);       
     }
 
-    /*
-    DELETE individual Person using ID
-     */
-    // OLD CODE - DAVID
-    // @DeleteMapping("/delete/{email}")
-    // public ResponseEntity<Person> deletePerson(@PathVariable String email) {
-    //     List<Person> persons = repository.findAllByOrderByEmailAsc(email);
-    //     if (!persons.isEmpty()) {  // Check if the list is not empty
-    //         Person person = persons.get(0);  // Get the first person from the list
-    //         repository.deleteByEmail(email);
-    //         return new ResponseEntity<>(person, HttpStatus.OK);
-    //     }
-    //     // Bad email
-    //     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    // }
-    
-    // NEW CODE - ADI
     @Transactional
     @DeleteMapping("/delete")
     public ResponseEntity<Person> deletePerson(@RequestParam("email") String email) {
@@ -96,22 +80,16 @@ public class PersonApiController {
     /*
     POST Aa record by Requesting Parameters from URI
      */
-    @PostMapping( "/post")
-    public ResponseEntity<Object> postPerson(@RequestParam("email") String email,
-                                             @RequestParam("password") String password,
-                                             @RequestParam("name") String name,
-                                             @RequestParam("dob") String dobString) {
-        Date dob;
-        System.out.println("\t\t\t\t\t"+email+"\t\t\t\t\t");
+    @PostMapping("/post")
+    public ResponseEntity<Object> postPerson(@RequestBody PersonRequest personRequest) {
         try {
-            dob = new SimpleDateFormat("MM-dd-yyyy").parse(dobString);
-        } catch (Exception e) {
-            return new ResponseEntity<>(dobString +" error;" + e + "try MM-dd-yyyy", HttpStatus.BAD_REQUEST);
+            Date dob = new SimpleDateFormat("MM-dd-yyyy").parse(personRequest.getDob());
+            Person person = new Person(personRequest.getEmail(), personRequest.getPassword(), personRequest.getName(), dob);
+            personDetailsService.save(person);
+            return new ResponseEntity<>(personRequest.getEmail() + " is created successfully", HttpStatus.CREATED);
+        } catch (ParseException e) {
+            return new ResponseEntity<>("Error parsing date: " + personRequest.getDob() + ". Please use the format MM-dd-yyyy.", HttpStatus.BAD_REQUEST);
         }
-        // A person object WITHOUT ID will create a new record with default roles as student
-        Person person = new Person(email, password, name, dob);
-        personDetailsService.save(person);
-        return new ResponseEntity<>(email +" is created successfully", HttpStatus.CREATED);
     }
 
     /*
@@ -162,13 +140,23 @@ public class PersonApiController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Object> putPerson(@RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("name") String name ) 
-    {
-        Person person = repository.findByEmail(email);
-        person.setPassword(password);
-        person.setName(name);
-        repository.save(person);
-        return new ResponseEntity<>(email +" is updated successfully", HttpStatus.OK);
+    public ResponseEntity<Object> putPerson(@RequestParam("email") String email, @RequestBody PersonRequest personRequest) {
+        try {
+            Date dob = new SimpleDateFormat("MM-dd-yyyy").parse(personRequest.getDob());
+            Person person = repository.findByEmail(email);
+
+            if (person != null) {
+                person.setPassword(personRequest.getPassword());
+                person.setName(personRequest.getName());
+                person.setDob(dob);
+                repository.save(person);
+                return new ResponseEntity<>(email + " is updated successfully", HttpStatus.OK);
+            }
+
+            return new ResponseEntity<>("Person with the given email not found", HttpStatus.NOT_FOUND);
+        } catch (ParseException e) {
+            return new ResponseEntity<>("Error parsing date: " + personRequest.getDob() + ". Please use the format MM-dd-yyyy.", HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
