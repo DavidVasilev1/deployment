@@ -81,14 +81,14 @@ public class PersonApiController {
     POST Aa record by Requesting Parameters from URI
      */
     @PostMapping("/post")
-    public ResponseEntity<Object> postPerson(@RequestBody PersonRequest personRequest) {
+    public ResponseEntity<Object> postPerson(@RequestBody Person personRequest) {
         try {
-            Date dob = new SimpleDateFormat("MM-dd-yyyy").parse(personRequest.getDob());
+            Date dob = personRequest.getDob();
             Person person = new Person(personRequest.getEmail(), personRequest.getPassword(), personRequest.getName(), dob);
             personDetailsService.save(person);
             return new ResponseEntity<>(personRequest.getEmail() + " is created successfully", HttpStatus.CREATED);
-        } catch (ParseException e) {
-            return new ResponseEntity<>("Error parsing date: " + personRequest.getDob() + ". Please use the format MM-dd-yyyy.", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error processing the request.", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -140,9 +140,9 @@ public class PersonApiController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Object> putPerson(@RequestParam("email") String email, @RequestBody PersonRequest personRequest) {
+    public ResponseEntity<Object> putPerson(@RequestParam("email") String email, @RequestBody Person personRequest) {
         try {
-            Date dob = new SimpleDateFormat("MM-dd-yyyy").parse(personRequest.getDob());
+            Date dob = personRequest.getDob();  // Assuming getDob() returns a Date
             Person person = repository.findByEmail(email);
 
             if (person != null) {
@@ -154,9 +154,8 @@ public class PersonApiController {
             }
 
             return new ResponseEntity<>("Person with the given email not found", HttpStatus.NOT_FOUND);
-        } catch (ParseException e) {
-            return new ResponseEntity<>("Error parsing date: " + personRequest.getDob() + ". Please use the format MM-dd-yyyy.", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error processing the request.", HttpStatus.BAD_REQUEST);
         }
     }
-
 }

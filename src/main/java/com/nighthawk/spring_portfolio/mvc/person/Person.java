@@ -27,12 +27,16 @@ import org.hibernate.type.SqlTypes;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 
 /*
 Person is a POJO, Plain Old Java Object.
@@ -67,20 +71,13 @@ public class Person {
     @Size(min = 2, max = 30, message = "Name (2 to 30 chars)")
     private String name;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = CustomDateDeserializer.class)
+    @DateTimeFormat(pattern = "MM-dd-yyyy")
     private Date dob;
 
     @ManyToMany(fetch = EAGER)
     private Collection<PersonRole> roles = new ArrayList<>();
 
-    /* HashMap is used to store JSON for daily "stats"
-    "stats": {
-        "2022-11-13": {
-            "calories": 2200,
-            "steps": 8000
-        }
-    }
-    */
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String,Map<String, Object>> stats = new HashMap<>(); 
