@@ -86,9 +86,9 @@ public class PersonApiController {
             Date dob = personRequest.getDob();
             Person person = new Person(personRequest.getEmail(), personRequest.getPassword(), personRequest.getName(), dob);
             personDetailsService.save(person);
-            return new ResponseEntity<>(personRequest.getEmail() + " is created successfully", HttpStatus.CREATED);
+            return new ResponseEntity<>(Map.of("message", personRequest.getEmail() + " is created successfully"), HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error processing the request.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Map.of("error", "Error processing the request."), HttpStatus.BAD_REQUEST);
         }
     }
 
